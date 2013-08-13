@@ -83,7 +83,7 @@ var _ = { };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, iterator) {
-    // TIP: see if you can re-use _.select() here, without simply
+    // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
 	var rejectedArr = [];
 	_.each(collection, function(value) {
@@ -138,15 +138,13 @@ var _ = { };
 
   // Calls the method named by methodName on each value in the list.
   _.invoke = function(list, methodName, args) {
-	  if (typeof methodName === "function"){
-		  return _.map(list, function(item){
+	  return _.map(list, function(item){
+		  if (typeof methodName === "function"){
 			  return methodName.apply(item, args);
-		  });
-	  } else {
-		  return _.map(list, function(item){
+		  } else {
 			  return item[methodName].apply(item, args);
-		  });
-	  };
+		  };
+	  });
   };
   
   // Reduces an array or object to a single value by repetitively calling
@@ -186,14 +184,37 @@ var _ = { };
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+ _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+	if (iterator == undefined){
+		iterator = function(i){
+			return i;
+		};
+	};
+		return _.reduce(collection, function(tested, i){
+			if (tested == undefined || tested == false){
+				return false;
+			} else {
+				return !!iterator(i);
+			};
+		}, true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
+	if (iterator == undefined){
+		iterator = function(i){
+			return i;
+		};
+	};
+	
+	var truthArr = [];
+	_.each(collection, function(i){
+		truthArr.push(!!iterator(i));
+	});
+	return _.contains(truthArr, true);
+    // TIP: There's a very clever way to re-use every() here.*/
   };
 
 
@@ -216,11 +237,26 @@ var _ = { };
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+	  for (var i=1; i<arguments.length; i++){
+		  _.each(arguments[i], function(value, key){
+			  obj[key] = value;
+		  });
+	  };
+	  return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+	  for (var i=1; i<arguments.length; i++){
+		  _.each(arguments[i], function(value, key){
+			  if (obj[key] == undefined){
+				  obj[key] = value;
+			  };
+		  });
+	  };
+	  return obj;
+	  
   };
 
 
@@ -235,7 +271,7 @@ var _ = { };
   // Return a function that can be called at most one time. Subsequent calls
   // should return the previously returned value.
   _.once = function(func) {
-    // TIP: These variables are stored in a "closure scope" (worth researching),
+    // TIP: These variables are stored in a ***"closure scope"*** (worth researching),
     // so that they'll remain available to the newly-generated function every
     // time it's called.
     var alreadyCalled = false;
@@ -261,6 +297,13 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+	  var memoObj = {};
+	  return function(key){
+		  if (memoObj[key] == undefined){
+			  memoObj[key] = func.apply(this, arguments);
+		  };
+		  return memoObj[key];
+	  };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -270,6 +313,10 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+	  var args = _.last(arguments, arguments.length-2);
+	  setTimeout(function(){
+		  func.apply(this, args);
+	  }, wait);
   };
 
 
@@ -280,6 +327,14 @@ var _ = { };
 
   // Shuffle an array.
   _.shuffle = function(array) {
+	  return _.map(array, function(){
+		  for (var i = array.length-1; i>0; i--){
+			  var j = Math.floor(Math.random() * (i + 1));
+			  var tempVal = array[i];
+			  array[i] = array[j];
+			  array[j] = tempVal;
+		  };
+	  });
   };
 
 

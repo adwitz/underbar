@@ -191,13 +191,9 @@ var _ = { };
 			return i;
 		};
 	};
-		return _.reduce(collection, function(tested, i){
-			if (tested == undefined || tested == false){
-				return false;
-			} else {
-				return !!iterator(i);
-			};
-		}, true)
+	return _.reduce(collection, function(tested, i){
+		return !!(iterator(i) && tested);
+	}, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -256,7 +252,6 @@ var _ = { };
 		  });
 	  };
 	  return obj;
-	  
   };
 
 

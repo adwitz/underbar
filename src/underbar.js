@@ -408,7 +408,19 @@ var _ = { };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
+  //try rewriting using _.filter
   _.difference = function(array) {
+	  var arr = array;
+	  for (var i=1; i<arguments.length; i++){
+		  var filteredArr = [];
+		  for (var j=0; j<arr.length; j++){
+			  if (!_.contains(arguments[i], arr[j])){
+				  filteredArr.push(arr[j]);
+			  }
+		  }
+		  arr = filteredArr;
+	  }
+	  return arr;
   };
 
 

@@ -48,12 +48,18 @@ var _ = { };
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
   _.each = function(collection, iterator) {
-	  for (var i in collection){
-		  iterator(collection[i], i, collection);
+	  if (Array.isArray(collection)){
+		  for (var i=0; i<collection.length; i++){
+			  iterator(collection[i], i, collection);
+		  };
+	  } else {
+		  for (var i in collection){
+			  iterator(collection[i], i, collection);
+		  };
 	  };
   };
-
-  // Returns the index at which value can be found in the array, or -1 if value
+  
+ // Returns the index at which value can be found in the array, or -1 if value
   // is not present in the array.
   _.indexOf = function(array, target){
 	  var indexValue = -1
@@ -352,6 +358,20 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+	  var arrDepth = arguments.length;
+	  var arrCount = _.reduce(arguments, function(max, arr){
+		  return max = (max>arr.length)? max : arr.length;
+	  }, 0)
+	  var zipped = [];
+	  for (var i=0; i<arrCount; i++){
+		  zipped.push([]);
+	  };
+	  for (var i=0; i<arrDepth; i++){
+		  for(var j=0; j<arrCount; j++){
+			  zipped[j].push(arguments[i][j]);
+		  };
+	  };
+	  return zipped;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -359,11 +379,31 @@ var _ = { };
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
-  };
+	  var result = result || [];
+	  _.each(nestedArray, function(i){
+		  if(Array.isArray(i)){
+			  _.flatten(i, result);
+		  } else {
+			  result.push(i);
+		  };
+	  });
+	  return result;
+	  };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+	  var intersect = [];
+	  for(var i=0; i<arguments.length-1; i++){
+		  var partArr = [];
+		  for(var y=0; y<arguments[i+1].length; y++){
+			  if(_.contains(arguments[i], arguments[i+1][y])){
+				  partArr.push(arguments[i+1][y]);
+			  };
+		  };
+		  intersect = partArr;
+	  };
+	  return intersect;
   };
 
   // Take the difference between one array and a number of other arrays.
